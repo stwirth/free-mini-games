@@ -4,13 +4,7 @@ A collection of free, browser-based mini games playable directly in your browser
 
 The site is statically served via [GitHub Pages](https://stwirth.github.io/free-mini-games/).
 
-## Games
-
-More games coming soon! Stay tuned.
-
-## Contributing
-
-Contributions are welcome! Feel free to open an issue or submit a pull request to add a new game or improve an existing one.
+> **This repository is 100% AI-driven.** All code and content is generated exclusively by AI agents. No manual code edits are allowed.
 
 ## License
 
