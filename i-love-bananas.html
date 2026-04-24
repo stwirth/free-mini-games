@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I love Bananas</title>
+  <style>
+    :root {
+      --bg: #1f1530;
+      --panel: #2a1c40;
+      --text: #f8f4d8;
+      --accent: #ffe05f;
+      --accent-2: #b97a57;
+      --good: #ffe45b;
+      --bad: #7a4c32;
+      --grass: #3f8f4a;
+      --basket: #8f5e35;
+      --basket-rim: #b57a4a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(#271d3f, #1a132e);
+      color: var(--text);
+      font-family: "Press Start 2P", "Courier New", monospace;
+      padding: 1rem;
+    }
+
+    .game-shell {
+      width: min(100%, 560px);
+      background: var(--panel);
+      border: 4px solid #140d24;
+      box-shadow: 0 0 0 4px #3d2a5e, 0 18px 28px rgba(0, 0, 0, 0.4);
+      padding: 1rem;
+    }
+
+    h1 {
+      margin: 0 0 0.8rem;
+      color: var(--accent);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      text-align: center;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.7rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .hud-item {
+      background: #1b1230;
+      border: 2px solid #44305e;
+      padding: 0.55rem 0.45rem;
+      flex: 1;
+      text-align: center;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 520px;
+      aspect-ratio: 13 / 16;
+      display: block;
+      margin: 0 auto;
+      border: 3px solid #0d0818;
+      background: var(--bg);
+      image-rendering: pixelated;
+    }
+
+    .controls {
+      margin-top: 0.8rem;
+      font-size: 0.62rem;
+      line-height: 1.6;
+      text-align: center;
+      color: #e4dcff;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.65rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell">
+    <h1>I love Bananas</h1>
+    <section class="hud" aria-label="Game information">
+      <div class="hud-item">Score: <span id="score">0</span></div>
+      <div class="hud-item">Time: <span id="time">60</span>s</div>
+    </section>
+    <canvas id="game" width="260" height="320" aria-label="Banana catching game"></canvas>
+    <p class="controls">Move with ←/→ or A/D. Yellow bananas: +1. Brown bananas: -1.</p>
+    <a class="back-link" href="./index.html">← Back to game list</a>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const timeEl = document.getElementById("time");
+
+    const world = {
+      width: canvas.width,
+      height: canvas.height,
+      score: 0,
+      timeLeft: 60,
+      gameOver: false,
+      spawnTimer: 0,
+      spawnInterval: 0.5,
+      bananas: [],
+      basket: { x: canvas.width / 2 - 18, y: canvas.height - 28, width: 36, height: 14, speed: 130 }
+    };
+
+    const keys = new Set();
+    addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+      if (["arrowleft", "arrowright", "a", "d"].includes(key)) {
+        event.preventDefault();
+      }
+      keys.add(key);
+      if (world.gameOver && key === " ") {
+        resetGame();
+      }
+    });
+    addEventListener("keyup", (event) => keys.delete(event.key.toLowerCase()));
+
+    function resetGame() {
+      world.score = 0;
+      world.timeLeft = 60;
+      world.gameOver = false;
+      world.spawnTimer = 0;
+      world.bananas = [];
+      world.basket.x = world.width / 2 - world.basket.width / 2;
+      scoreEl.textContent = "0";
+      timeEl.textContent = "60";
+    }
+
+    function spawnBanana() {
+      const isOld = Math.random() < 0.3;
+      world.bananas.push({
+        x: Math.floor(Math.random() * (world.width - 14)),
+        y: -18,
+        width: 14,
+        height: 16,
+        speed: 38 + Math.random() * 40,
+        old: isOld
+      });
+    }
+
+    function overlaps(a, b) {
+      return (
+        a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y
+      );
+    }
+
+    function update(dt) {
+      if (world.gameOver) return;
+
+      const moveLeft = keys.has("arrowleft") || keys.has("a");
+      const moveRight = keys.has("arrowright") || keys.has("d");
+      const horizontal = (moveRight ? 1 : 0) - (moveLeft ? 1 : 0);
+      world.basket.x += horizontal * world.basket.speed * dt;
+      world.basket.x = Math.max(0, Math.min(world.width - world.basket.width, world.basket.x));
+
+      world.spawnTimer += dt;
+      if (world.spawnTimer >= world.spawnInterval) {
+        world.spawnTimer -= world.spawnInterval;
+        spawnBanana();
+      }
+
+      for (const banana of world.bananas) {
+        banana.y += banana.speed * dt;
+      }
+
+      world.bananas = world.bananas.filter((banana) => {
+        if (overlaps(banana, world.basket)) {
+          world.score += banana.old ? -1 : 1;
+          scoreEl.textContent = String(world.score);
+          return false;
+        }
+        return banana.y <= world.height + banana.height;
+      });
+
+      world.timeLeft = Math.max(0, world.timeLeft - dt);
+      timeEl.textContent = String(Math.ceil(world.timeLeft));
+      if (world.timeLeft <= 0) {
+        world.gameOver = true;
+      }
+    }
+
+    function drawSky() {
+      ctx.fillStyle = "#3a2b58";
+      ctx.fillRect(0, 0, world.width, world.height);
+      ctx.fillStyle = "#4d3973";
+      for (let i = 0; i < world.width; i += 24) {
+        ctx.fillRect(i, 0, 12, 10);
+      }
+      ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+      for (let y = 12; y < world.height - 34; y += 18) {
+        ctx.fillRect((y * 7) % world.width, y, 10, 2);
+      }
+    }
+
+    function drawBanana(banana) {
+      const color = banana.old ? getComputedStyle(document.documentElement).getPropertyValue("--bad") : getComputedStyle(document.documentElement).getPropertyValue("--good");
+      ctx.fillStyle = color;
+      ctx.fillRect(banana.x + 2, banana.y + 1, 8, 3);
+      ctx.fillRect(banana.x + 1, banana.y + 4, 10, 3);
+      ctx.fillRect(banana.x + 2, banana.y + 7, 8, 3);
+      ctx.fillRect(banana.x + 4, banana.y + 10, 5, 3);
+      ctx.fillStyle = "#3f2717";
+      ctx.fillRect(banana.x + 10, banana.y + 4, 2, 2);
+      ctx.fillRect(banana.x + 2, banana.y + 11, 2, 2);
+    }
+
+    function drawBasket() {
+      const b = world.basket;
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--basket-rim");
+      ctx.fillRect(b.x, b.y, b.width, 3);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--basket");
+      ctx.fillRect(b.x + 2, b.y + 3, b.width - 4, b.height - 3);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
+      for (let x = b.x + 4; x < b.x + b.width - 2; x += 6) {
+        ctx.fillRect(x, b.y + 4, 1, b.height - 4);
+      }
+    }
+
+    function drawGround() {
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--grass");
+      ctx.fillRect(0, world.height - 8, world.width, 8);
+      ctx.fillStyle = "#58b464";
+      for (let x = 0; x < world.width; x += 6) {
+        ctx.fillRect(x, world.height - 8, 3, 3);
+      }
+    }
+
+    function draw() {
+      drawSky();
+      for (const banana of world.bananas) {
+        drawBanana(banana);
+      }
+      drawGround();
+      drawBasket();
+
+      if (world.gameOver) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+        ctx.fillRect(0, 0, world.width, world.height);
+        ctx.fillStyle = "#ffe05f";
+        ctx.font = "12px 'Courier New', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("TIME UP!", world.width / 2, world.height / 2 - 8);
+        ctx.fillStyle = "#f8f4d8";
+        ctx.fillText(`Score: ${world.score}`, world.width / 2, world.height / 2 + 12);
+      }
+    }
+
+    let last = performance.now();
+    function frame(now) {
+      const dt = Math.min((now - last) / 1000, 0.033);
+      last = now;
+      update(dt);
+      draw();
+      requestAnimationFrame(frame);
+    }
+
+    resetGame();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
