@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I love Bananas</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top, #2c2f6f 0%, #101125 50%, #07070f 100%);
+      font-family: "Press Start 2P", "Courier New", Courier, monospace;
+      color: #fffef7;
+      padding: 1rem;
+    }
+
+    .game-shell {
+      width: min(100%, 760px);
+      border: 4px solid #f6d94e;
+      background: #121225;
+      padding: 1rem;
+      box-shadow: 0 0 0 4px #573a21, 0 18px 35px rgba(0, 0, 0, 0.45);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      color: #f6d94e;
+      text-shadow: 2px 2px #3f2d1c;
+    }
+
+    .hud {
+      margin: 0.9rem 0;
+      display: flex;
+      gap: 0.75rem;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      font-size: 0.62rem;
+    }
+
+    .hud span {
+      display: inline-block;
+      padding: 0.4rem 0.55rem;
+      border: 2px solid #f6d94e;
+      background: #1f1f3f;
+      color: #fffef7;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      border: 4px solid #77b3ff;
+      background: #87cbff;
+      image-rendering: pixelated;
+      display: block;
+    }
+
+    .controls {
+      margin-top: 0.9rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      line-height: 1.5;
+    }
+
+    button {
+      border: 2px solid #f6d94e;
+      background: #2c7f35;
+      color: #fffef7;
+      font: inherit;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: #38a845;
+      outline: none;
+    }
+
+    a {
+      color: #9ad1ff;
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell">
+    <h1>I love Bananas</h1>
+    <section class="hud" aria-label="Game status">
+      <span id="score">Score: 0</span>
+      <span id="timer">Time: 60s</span>
+      <span id="status">Catch yellow 🍌, avoid old brown 🍌</span>
+    </section>
+    <canvas id="game" width="640" height="360" aria-label="I love Bananas game area"></canvas>
+    <section class="controls">
+      <span>Move with ◀ ▶ or A / D</span>
+      <button id="restart" type="button">Restart</button>
+      <a href="../index.html">Back to games</a>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+    const statusEl = document.getElementById("status");
+    const restartButton = document.getElementById("restart");
+
+    const GAME_DURATION = 60;
+    const SPAWN_INTERVAL = 450;
+    const BASKET = { width: 90, height: 20, y: canvas.height - 34, speed: 340 };
+    const BANANA_SIZE = 18;
+
+    let basketX = (canvas.width - BASKET.width) / 2;
+    let bananas = [];
+    let heldKeys = new Set();
+    let score = 0;
+    let timeLeft = GAME_DURATION;
+    let gameOver = false;
+    let spawnTicker = 0;
+    let lastFrame = performance.now();
+
+    function resetGame() {
+      basketX = (canvas.width - BASKET.width) / 2;
+      bananas = [];
+      heldKeys.clear();
+      score = 0;
+      timeLeft = GAME_DURATION;
+      gameOver = false;
+      spawnTicker = 0;
+      lastFrame = performance.now();
+      updateHud();
+      statusEl.textContent = "Catch yellow 🍌, avoid old brown 🍌";
+    }
+
+    function updateHud() {
+      scoreEl.textContent = `Score: ${score}`;
+      timerEl.textContent = `Time: ${Math.max(0, Math.ceil(timeLeft))}s`;
+    }
+
+    function spawnBanana() {
+      const oldBanana = Math.random() < 0.22;
+      bananas.push({
+        x: 10 + Math.random() * (canvas.width - BANANA_SIZE - 20),
+        y: -BANANA_SIZE,
+        speed: 78 + Math.random() * 70,
+        old: oldBanana
+      });
+    }
+
+    function drawPixelRect(x, y, w, h, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    }
+
+    function drawBackground() {
+      drawPixelRect(0, 0, canvas.width, canvas.height, "#87cbff");
+      drawPixelRect(0, canvas.height - 70, canvas.width, 70, "#79c45b");
+      drawPixelRect(25, 30, 75, 18, "#dff3ff");
+      drawPixelRect(290, 54, 95, 20, "#dff3ff");
+      drawPixelRect(500, 22, 70, 16, "#dff3ff");
+    }
+
+    function drawBanana(banana) {
+      const color = banana.old ? "#8d592f" : "#f4d04e";
+      const shadow = banana.old ? "#5b361b" : "#c9a530";
+      drawPixelRect(banana.x + 2, banana.y, BANANA_SIZE - 6, 4, color);
+      drawPixelRect(banana.x, banana.y + 4, BANANA_SIZE - 2, 5, color);
+      drawPixelRect(banana.x + 2, banana.y + 9, BANANA_SIZE - 4, 5, color);
+      drawPixelRect(banana.x + 4, banana.y + 14, BANANA_SIZE - 8, 3, color);
+      drawPixelRect(banana.x + 2, banana.y + 4, 2, 10, shadow);
+      drawPixelRect(banana.x + BANANA_SIZE - 4, banana.y + 4, 2, 10, shadow);
+    }
+
+    function drawBasket() {
+      drawPixelRect(basketX, BASKET.y, BASKET.width, BASKET.height, "#8f5f2f");
+      drawPixelRect(basketX + 4, BASKET.y + 4, BASKET.width - 8, BASKET.height - 8, "#c48745");
+      drawPixelRect(basketX + 10, BASKET.y - 4, BASKET.width - 20, 4, "#d49a57");
+    }
+
+    function intersectsBasket(banana) {
+      const bx = banana.x;
+      const by = banana.y;
+      return (
+        by + BANANA_SIZE >= BASKET.y &&
+        by <= BASKET.y + BASKET.height &&
+        bx + BANANA_SIZE >= basketX &&
+        bx <= basketX + BASKET.width
+      );
+    }
+
+    function tick(now) {
+      const dt = Math.min(0.04, (now - lastFrame) / 1000);
+      lastFrame = now;
+
+      if (!gameOver) {
+        if (heldKeys.has("arrowleft") || heldKeys.has("a")) {
+          basketX -= BASKET.speed * dt;
+        }
+        if (heldKeys.has("arrowright") || heldKeys.has("d")) {
+          basketX += BASKET.speed * dt;
+        }
+        basketX = Math.max(0, Math.min(canvas.width - BASKET.width, basketX));
+
+        spawnTicker += dt * 1000;
+        while (spawnTicker >= SPAWN_INTERVAL) {
+          spawnTicker -= SPAWN_INTERVAL;
+          spawnBanana();
+        }
+
+        bananas = bananas.filter((banana) => {
+          banana.y += banana.speed * dt;
+          if (intersectsBasket(banana)) {
+            score += banana.old ? -1 : 1;
+            updateHud();
+            return false;
+          }
+          return banana.y < canvas.height + BANANA_SIZE;
+        });
+
+        timeLeft -= dt;
+        if (timeLeft <= 0) {
+          timeLeft = 0;
+          gameOver = true;
+          statusEl.textContent = `Time up! Final score: ${score}`;
+        }
+
+        updateHud();
+      }
+
+      drawBackground();
+      bananas.forEach(drawBanana);
+      drawBasket();
+      requestAnimationFrame(tick);
+    }
+
+    window.addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+      if (["arrowleft", "arrowright", "a", "d"].includes(key)) {
+        event.preventDefault();
+        heldKeys.add(key);
+      }
+    });
+
+    window.addEventListener("keyup", (event) => {
+      heldKeys.delete(event.key.toLowerCase());
+    });
+
+    restartButton.addEventListener("click", resetGame);
+
+    resetGame();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
