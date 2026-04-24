@@ -8,7 +8,7 @@ The site is statically served via [GitHub Pages](https://stwirth.github.io/free-
 
 ## Instructions for coding agents
 
-* All commits should include the full (verbatim) prompt that led to the commit as commit messages.
+* All commits should include the full (verbatim) prompt that led to the commit in the commit message.
 * Every HTML site should contain a sidebar with a changelog, containing commit SHAs and commit messages, linking to the respective commit.
 
 ## License
