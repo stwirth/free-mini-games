@@ -80,6 +80,7 @@
       border: 3px solid #0d0818;
       background: var(--bg);
       image-rendering: pixelated;
+      touch-action: none;
     }
 
     .controls {
@@ -177,7 +178,7 @@
         <div class="hud-item">Time: <span id="time">60</span>s</div>
       </section>
       <canvas id="game" width="260" height="320" aria-label="Banana catching game"></canvas>
-      <p class="controls">Move with ←/→ or A/D. Yellow bananas: +1. Brown bananas: -1.</p>
+      <p class="controls">Move with ←/→ or A/D, or drag on the game area. Yellow bananas: +1. Brown bananas: -1.</p>
       <p class="model-info">Model used: GPT-5.3-Codex</p>
       <a class="back-link" href="./index.html">← Back to game list</a>
       <p id="announce" class="sr-only" aria-live="polite"></p>
@@ -223,6 +224,7 @@
     };
 
     const keys = new Set();
+    const dragState = { active: false, pointerId: null };
     addEventListener("keydown", (event) => {
       const key = event.key.toLowerCase();
       if (["arrowleft", "arrowright", "a", "d"].includes(key)) {
@@ -231,6 +233,40 @@
       keys.add(key);
     });
     addEventListener("keyup", (event) => keys.delete(event.key.toLowerCase()));
+
+    function clampBasketX(x) {
+      return Math.max(0, Math.min(world.width - world.basket.width, x));
+    }
+
+    function setBasketFromClientX(clientX) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = world.width / rect.width;
+      const localX = (clientX - rect.left) * scaleX;
+      world.basket.x = clampBasketX(localX - world.basket.width / 2);
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      dragState.active = true;
+      dragState.pointerId = event.pointerId;
+      canvas.setPointerCapture(event.pointerId);
+      setBasketFromClientX(event.clientX);
+      event.preventDefault();
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      if (!dragState.active || event.pointerId !== dragState.pointerId) return;
+      setBasketFromClientX(event.clientX);
+      event.preventDefault();
+    });
+
+    function endDrag(event) {
+      if (event.pointerId !== dragState.pointerId) return;
+      dragState.active = false;
+      dragState.pointerId = null;
+    }
+
+    canvas.addEventListener("pointerup", endDrag);
+    canvas.addEventListener("pointercancel", endDrag);
 
     function resetGame() {
       world.score = 0;
@@ -272,7 +308,7 @@
       const moveRight = keys.has("arrowright") || keys.has("d");
       const horizontal = (moveRight ? 1 : 0) - (moveLeft ? 1 : 0);
       world.basket.x += horizontal * world.basket.speed * dt;
-      world.basket.x = Math.max(0, Math.min(world.width - world.basket.width, world.basket.x));
+      world.basket.x = clampBasketX(world.basket.x);
 
       world.spawnTimer += dt;
       if (world.spawnTimer >= world.spawnInterval) {
