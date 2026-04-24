@@ -123,6 +123,9 @@
 
     const GAME_DURATION = 60;
     const SPAWN_INTERVAL = 450;
+    const OLD_BANANA_SPAWN_RATE = 0.22;
+    const MIN_BANANA_SPEED = 78;
+    const BANANA_SPEED_RANGE = 70;
     const BASKET = { width: 90, height: 20, y: canvas.height - 34, speed: 340 };
     const BANANA_SIZE = 18;
 
@@ -154,11 +157,11 @@
     }
 
     function spawnBanana() {
-      const oldBanana = Math.random() < 0.22;
+      const oldBanana = Math.random() < OLD_BANANA_SPAWN_RATE;
       bananas.push({
         x: 10 + Math.random() * (canvas.width - BANANA_SIZE - 20),
         y: -BANANA_SIZE,
-        speed: 78 + Math.random() * 70,
+        speed: MIN_BANANA_SPEED + Math.random() * BANANA_SPEED_RANGE,
         old: oldBanana
       });
     }
