@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I love Bananas</title>
+  <style>
+    :root {
+      --bg: #1f1530;
+      --panel: #2a1c40;
+      --text: #f8f4d8;
+      --accent: #ffe05f;
+      --accent-2: #b97a57;
+      --good: #ffe45b;
+      --bad: #7a4c32;
+      --grass: #3f8f4a;
+      --basket: #8f5e35;
+      --basket-rim: #b57a4a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(#271d3f, #1a132e);
+      color: var(--text);
+      font-family: "Press Start 2P", "Courier New", monospace;
+      padding: 1rem;
+    }
+
+    .page-layout {
+      max-width: 980px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 560px) 280px;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .game-shell {
+      width: min(100%, 560px);
+      background: var(--panel);
+      border: 4px solid #140d24;
+      box-shadow: 0 0 0 4px #3d2a5e, 0 18px 28px rgba(0, 0, 0, 0.4);
+      padding: 1rem;
+    }
+
+    h1 {
+      margin: 0 0 0.8rem;
+      color: var(--accent);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      text-align: center;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.7rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .hud-item {
+      background: #1b1230;
+      border: 2px solid #44305e;
+      padding: 0.55rem 0.45rem;
+      flex: 1;
+      text-align: center;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 520px;
+      aspect-ratio: 13 / 16;
+      display: block;
+      margin: 0 auto;
+      border: 3px solid #0d0818;
+      background: var(--bg);
+      image-rendering: pixelated;
+    }
+
+    .controls {
+      margin-top: 0.8rem;
+      font-size: 0.62rem;
+      line-height: 1.6;
+      text-align: center;
+      color: #e4dcff;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.65rem;
+    }
+
+    .model-info {
+      margin-top: 0.65rem;
+      text-align: center;
+      font-size: 0.58rem;
+      color: #d6cdf7;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .sidebar {
+      background: #201336;
+      border: 3px solid #140d24;
+      box-shadow: 0 0 0 3px #3d2a5e;
+      padding: 0.8rem;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 0.6rem;
+      color: var(--accent);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .sidebar li {
+      font-size: 0.56rem;
+      line-height: 1.45;
+      color: #e4dcff;
+    }
+
+    .sidebar a {
+      color: #ffe894;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 930px) {
+      .page-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-layout">
+    <main class="game-shell">
+      <h1>I love Bananas</h1>
+      <section class="hud" aria-label="Game information">
+        <div class="hud-item">Score: <span id="score">0</span></div>
+        <div class="hud-item">Time: <span id="time">60</span>s</div>
+      </section>
+      <canvas id="game" width="260" height="320" aria-label="Banana catching game"></canvas>
+      <p class="controls">Move with ←/→ or A/D. Yellow bananas: +1. Brown bananas: -1.</p>
+      <p class="model-info">Model used: GPT-5.3-Codex</p>
+      <a class="back-link" href="./index.html">← Back to game list</a>
+      <p id="announce" class="sr-only" aria-live="polite"></p>
+    </main>
+
+    <aside class="sidebar" aria-label="Changelog">
+      <h2>Changelog</h2>
+      <ul>
+        <li><a href="https://github.com/stwirth/free-mini-games/commit/fca4030" target="_blank" rel="noopener">fca4030</a> — Refine I love Bananas accessibility and game constants</li>
+        <li><a href="https://github.com/stwirth/free-mini-games/commit/81fc95a" target="_blank" rel="noopener">81fc95a</a> — Add I love Bananas game and index entry</li>
+        <li><a href="https://github.com/stwirth/free-mini-games/commit/1ae5210" target="_blank" rel="noopener">1ae5210</a> — Initial plan</li>
+      </ul>
+    </aside>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const timeEl = document.getElementById("time");
+    const announceEl = document.getElementById("announce");
+    const MAX_DELTA_TIME = 1 / 30;
+    const BROWN_BANANA_PROBABILITY = 0.3;
+    const MIN_BANANA_SPEED = 38;
+    const BANANA_SPEED_VARIANCE = 40;
+    const rootStyles = getComputedStyle(document.documentElement);
+    const colors = {
+      good: rootStyles.getPropertyValue("--good"),
+      bad: rootStyles.getPropertyValue("--bad"),
+      basket: rootStyles.getPropertyValue("--basket"),
+      basketRim: rootStyles.getPropertyValue("--basket-rim"),
+      grass: rootStyles.getPropertyValue("--grass")
+    };
+
+    const world = {
+      width: canvas.width,
+      height: canvas.height,
+      score: 0,
+      timeLeft: 60,
+      gameOver: false,
+      spawnTimer: 0,
+      spawnInterval: 0.5,
+      bananas: [],
+      basket: { x: canvas.width / 2 - 18, y: canvas.height - 28, width: 36, height: 14, speed: 130 }
+    };
+
+    const keys = new Set();
+    addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+      if (["arrowleft", "arrowright", "a", "d"].includes(key)) {
+        event.preventDefault();
+      }
+      keys.add(key);
+    });
+    addEventListener("keyup", (event) => keys.delete(event.key.toLowerCase()));
+
+    function resetGame() {
+      world.score = 0;
+      world.timeLeft = 60;
+      world.gameOver = false;
+      world.spawnTimer = 0;
+      world.bananas = [];
+      world.basket.x = world.width / 2 - world.basket.width / 2;
+      scoreEl.textContent = "0";
+      timeEl.textContent = "60";
+      announceEl.textContent = "";
+    }
+
+    function spawnBanana() {
+      const isOld = Math.random() < BROWN_BANANA_PROBABILITY;
+      world.bananas.push({
+        x: Math.floor(Math.random() * (world.width - 14)),
+        y: -18,
+        width: 14,
+        height: 16,
+        speed: MIN_BANANA_SPEED + Math.random() * BANANA_SPEED_VARIANCE,
+        old: isOld
+      });
+    }
+
+    function overlaps(a, b) {
+      return (
+        a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y
+      );
+    }
+
+    function update(dt) {
+      if (world.gameOver) return;
+
+      const moveLeft = keys.has("arrowleft") || keys.has("a");
+      const moveRight = keys.has("arrowright") || keys.has("d");
+      const horizontal = (moveRight ? 1 : 0) - (moveLeft ? 1 : 0);
+      world.basket.x += horizontal * world.basket.speed * dt;
+      world.basket.x = Math.max(0, Math.min(world.width - world.basket.width, world.basket.x));
+
+      world.spawnTimer += dt;
+      if (world.spawnTimer >= world.spawnInterval) {
+        world.spawnTimer -= world.spawnInterval;
+        spawnBanana();
+      }
+
+      for (const banana of world.bananas) {
+        banana.y += banana.speed * dt;
+      }
+
+      world.bananas = world.bananas.filter((banana) => {
+        if (overlaps(banana, world.basket)) {
+          world.score += banana.old ? -1 : 1;
+          scoreEl.textContent = String(world.score);
+          return false;
+        }
+        return banana.y <= world.height + banana.height;
+      });
+
+      world.timeLeft = Math.max(0, world.timeLeft - dt);
+      timeEl.textContent = String(Math.ceil(world.timeLeft));
+      if (world.timeLeft <= 0) {
+        world.gameOver = true;
+        announceEl.textContent = `Time up. Final score: ${world.score}.`;
+      }
+    }
+
+    function drawSky() {
+      ctx.fillStyle = "#3a2b58";
+      ctx.fillRect(0, 0, world.width, world.height);
+      ctx.fillStyle = "#4d3973";
+      for (let i = 0; i < world.width; i += 24) {
+        ctx.fillRect(i, 0, 12, 10);
+      }
+      ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+      for (let y = 12; y < world.height - 34; y += 18) {
+        ctx.fillRect((y * 7) % world.width, y, 10, 2);
+      }
+    }
+
+    function drawBanana(banana) {
+      const color = banana.old ? colors.bad : colors.good;
+      const highlight = banana.old ? "#a5734c" : "#fff4a3";
+      const shadow = banana.old ? "#5c3825" : "#cfb53d";
+      ctx.fillStyle = color;
+      ctx.fillRect(banana.x + 3, banana.y + 1, 7, 2);
+      ctx.fillRect(banana.x + 2, banana.y + 3, 9, 2);
+      ctx.fillRect(banana.x + 2, banana.y + 5, 8, 2);
+      ctx.fillRect(banana.x + 3, banana.y + 7, 6, 2);
+      ctx.fillStyle = highlight;
+      ctx.fillRect(banana.x + 4, banana.y + 2, 4, 1);
+      ctx.fillRect(banana.x + 4, banana.y + 4, 5, 1);
+      ctx.fillStyle = shadow;
+      ctx.fillRect(banana.x + 9, banana.y + 3, 1, 4);
+      ctx.fillRect(banana.x + 8, banana.y + 7, 1, 1);
+      ctx.fillStyle = "#3f2717";
+      ctx.fillRect(banana.x + 10, banana.y + 2, 2, 1);
+      ctx.fillRect(banana.x + 3, banana.y + 8, 2, 1);
+    }
+
+    function drawBasket() {
+      const b = world.basket;
+      ctx.fillStyle = colors.basketRim;
+      ctx.fillRect(b.x, b.y, b.width, 3);
+      ctx.fillStyle = colors.basket;
+      ctx.fillRect(b.x + 2, b.y + 3, b.width - 4, b.height - 3);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
+      for (let x = b.x + 4; x < b.x + b.width - 2; x += 6) {
+        ctx.fillRect(x, b.y + 4, 1, b.height - 4);
+      }
+    }
+
+    function drawGround() {
+      ctx.fillStyle = colors.grass;
+      ctx.fillRect(0, world.height - 8, world.width, 8);
+      ctx.fillStyle = "#58b464";
+      for (let x = 0; x < world.width; x += 6) {
+        ctx.fillRect(x, world.height - 8, 3, 3);
+      }
+    }
+
+    function draw() {
+      drawSky();
+      for (const banana of world.bananas) {
+        drawBanana(banana);
+      }
+      drawGround();
+      drawBasket();
+
+      if (world.gameOver) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+        ctx.fillRect(0, 0, world.width, world.height);
+        ctx.fillStyle = "#ffe05f";
+        ctx.font = "12px 'Courier New', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("TIME UP!", world.width / 2, world.height / 2 - 8);
+        ctx.fillStyle = "#f8f4d8";
+        ctx.fillText(`Score: ${world.score}`, world.width / 2, world.height / 2 + 12);
+      }
+    }
+
+    let last = performance.now();
+    function frame(now) {
+      const dt = Math.min((now - last) / 1000, MAX_DELTA_TIME);
+      last = now;
+      update(dt);
+      draw();
+      requestAnimationFrame(frame);
+    }
+
+    resetGame();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
