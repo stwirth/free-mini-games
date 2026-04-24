@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Mini Games</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f0f1a;
+      color: #e0e0f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1a3e 0%, #2d1b69 100%);
+      padding: 3rem 1rem;
+      text-align: center;
+      border-bottom: 3px solid #6c63ff;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(108, 99, 255, 0.8);
+    }
+
+    header p {
+      margin-top: 0.75rem;
+      font-size: 1.1rem;
+      color: #b0aed0;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #a89cff;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #2a2a4a;
+      padding-bottom: 0.5rem;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .game-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      color: inherit;
+      display: block;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+      border-color: #6c63ff;
+      box-shadow: 0 8px 24px rgba(108, 99, 255, 0.3);
+    }
+
+    .game-card .icon {
+      font-size: 3rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .game-card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #ffffff;
+    }
+
+    .game-card p {
+      font-size: 0.88rem;
+      color: #8888aa;
+      line-height: 1.4;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      background: #2a2a4a;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      color: #a89cff;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #555577;
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: #6c63ff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎮 Free Mini Games</h1>
+    <p>Play fun, free games right in your browser — no download needed!</p>
+  </header>
+
+  <main>
+    <h2 class="section-title">Games</h2>
+    <div class="games-grid">
+
+      <div class="game-card" aria-label="Tic Tac Toe (coming soon)">
+        <div class="icon">⭕</div>
+        <h2>Tic Tac Toe</h2>
+        <p>Classic two-player strategy game. Get three in a row to win!</p>
+        <span class="badge">Coming Soon</span>
+      </div>
+
+      <div class="game-card" aria-label="Snake (coming soon)">
+        <div class="icon">🐍</div>
+        <h2>Snake</h2>
+        <p>Guide the snake to eat food and grow — without hitting the walls!</p>
+        <span class="badge">Coming Soon</span>
+      </div>
+
+      <div class="game-card" aria-label="Memory Match (coming soon)">
+        <div class="icon">🃏</div>
+        <h2>Memory Match</h2>
+        <p>Flip cards and find matching pairs as fast as you can.</p>
+        <span class="badge">Coming Soon</span>
+      </div>
+
+      <div class="game-card" aria-label="Pong (coming soon)">
+        <div class="icon">🏓</div>
+        <h2>Pong</h2>
+        <p>The original arcade classic — bouncing ball, two paddles, endless fun.</p>
+        <span class="badge">Coming Soon</span>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>Open source &amp; free forever &mdash;
+      <a href="https://github.com/stwirth/free-mini-games" target="_blank" rel="noopener">View on GitHub</a>
+    </p>
+  </footer>
+
+</body>
+</html>
