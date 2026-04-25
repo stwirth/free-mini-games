@@ -6,16 +6,11 @@
   <title>I love Bananas</title>
   <style>
     :root {
-      --bg: #1f1530;
-      --panel: #2a1c40;
-      --text: #f8f4d8;
-      --accent: #ffe05f;
-      --accent-2: #b97a57;
-      --good: #ffe45b;
-      --bad: #7a4c32;
-      --grass: #3f8f4a;
-      --basket: #8f5e35;
-      --basket-rim: #b57a4a;
+      --bg: #e8f5fb;
+      --panel: #fffdf0;
+      --text: #3d2b1f;
+      --accent: #f5a623;
+      --accent-2: #6dbf67;
     }
 
     * { box-sizing: border-box; }
@@ -23,9 +18,9 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: linear-gradient(#271d3f, #1a132e);
+      background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 50%, #a8e6cf 100%);
       color: var(--text);
-      font-family: "Press Start 2P", "Courier New", monospace;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       padding: 1rem;
     }
 
@@ -41,17 +36,17 @@
     .game-shell {
       width: min(100%, 560px);
       background: var(--panel);
-      border: 4px solid #140d24;
-      box-shadow: 0 0 0 4px #3d2a5e, 0 18px 28px rgba(0, 0, 0, 0.4);
+      border: 2px solid #e8d48a;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
       padding: 1rem;
     }
 
     h1 {
       margin: 0 0 0.8rem;
       color: var(--accent);
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      font-size: 1.6rem;
+      font-weight: 800;
       text-align: center;
     }
 
@@ -59,14 +54,16 @@
       display: flex;
       justify-content: space-between;
       gap: 0.75rem;
-      font-size: 0.7rem;
+      font-size: 1rem;
+      font-weight: 700;
       margin-bottom: 0.8rem;
     }
 
     .hud-item {
-      background: #1b1230;
-      border: 2px solid #44305e;
-      padding: 0.55rem 0.45rem;
+      background: #fff9d6;
+      border: 2px solid #f5d060;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
       flex: 1;
       text-align: center;
     }
@@ -77,18 +74,18 @@
       aspect-ratio: 13 / 16;
       display: block;
       margin: 0 auto;
-      border: 3px solid #0d0818;
+      border: 3px solid #b8860b;
+      border-radius: 12px;
       background: var(--bg);
-      image-rendering: pixelated;
       touch-action: none;
     }
 
     .controls {
       margin-top: 0.8rem;
-      font-size: 0.62rem;
+      font-size: 0.85rem;
       line-height: 1.6;
       text-align: center;
-      color: #e4dcff;
+      color: #5a4a35;
     }
 
     .back-link {
@@ -96,14 +93,15 @@
       margin-top: 0.75rem;
       color: var(--accent);
       text-decoration: none;
-      font-size: 0.65rem;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
 
     .model-info {
       margin-top: 0.65rem;
       text-align: center;
-      font-size: 0.58rem;
-      color: #d6cdf7;
+      font-size: 0.75rem;
+      color: #7a6a55;
     }
 
     .sr-only {
@@ -119,9 +117,10 @@
     }
 
     .sidebar {
-      background: #201336;
-      border: 3px solid #140d24;
-      box-shadow: 0 0 0 3px #3d2a5e;
+      background: var(--panel);
+      border: 2px solid #e8d48a;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       padding: 0.8rem;
       position: sticky;
       top: 1rem;
@@ -130,9 +129,8 @@
     .sidebar h2 {
       margin: 0 0 0.6rem;
       color: var(--accent);
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      font-size: 1rem;
+      font-weight: 700;
     }
 
     .sidebar ul {
@@ -144,13 +142,13 @@
     }
 
     .sidebar li {
-      font-size: 0.56rem;
+      font-size: 0.82rem;
       line-height: 1.45;
-      color: #e4dcff;
+      color: #5a4a35;
     }
 
     .sidebar a {
-      color: #ffe894;
+      color: #c07a00;
       text-decoration: none;
     }
 
@@ -188,6 +186,7 @@
       <h2>History</h2>
       <ul>
         <li>Add the I love Bananas game and iterative gameplay/UI refinements (<a href="https://github.com/stwirth/free-mini-games/issues/6" target="_blank" rel="noopener">#6</a>)</li>
+        <li>Change banana game design to emoji-based (🍌🧺), modern look without pixel art (<a href="https://github.com/stwirth/free-mini-games/issues/8" target="_blank" rel="noopener">#8</a>)</li>
       </ul>
     </aside>
   </div>
@@ -202,14 +201,10 @@
     const BROWN_BANANA_PROBABILITY = 0.3;
     const MIN_BANANA_SPEED = 38;
     const BANANA_SPEED_VARIANCE = 40;
-    const rootStyles = getComputedStyle(document.documentElement);
-    const colors = {
-      good: rootStyles.getPropertyValue("--good"),
-      bad: rootStyles.getPropertyValue("--bad"),
-      basket: rootStyles.getPropertyValue("--basket"),
-      basketRim: rootStyles.getPropertyValue("--basket-rim"),
-      grass: rootStyles.getPropertyValue("--grass")
-    };
+    const BANANA_SIZE = 28;
+    const BASKET_WIDTH = 56;
+    const BASKET_HEIGHT = 48;
+    const BASKET_BOTTOM_MARGIN = 4;
 
     const world = {
       width: canvas.width,
@@ -220,7 +215,7 @@
       spawnTimer: 0,
       spawnInterval: 0.5,
       bananas: [],
-      basket: { x: canvas.width / 2 - 18, y: canvas.height - 28, width: 36, height: 14, speed: 130 }
+      basket: { x: canvas.width / 2 - BASKET_WIDTH / 2, y: canvas.height - BASKET_HEIGHT - BASKET_BOTTOM_MARGIN, width: BASKET_WIDTH, height: BASKET_HEIGHT, speed: 130 }
     };
 
     const keys = new Set();
@@ -290,10 +285,10 @@
     function spawnBanana() {
       const isOld = Math.random() < BROWN_BANANA_PROBABILITY;
       world.bananas.push({
-        x: Math.floor(Math.random() * (world.width - 14)),
-        y: -18,
-        width: 14,
-        height: 16,
+        x: Math.floor(Math.random() * (world.width - BANANA_SIZE)),
+        y: -BANANA_SIZE - 4,
+        width: BANANA_SIZE,
+        height: BANANA_SIZE,
         speed: MIN_BANANA_SPEED + Math.random() * BANANA_SPEED_VARIANCE,
         old: isOld
       });
@@ -345,56 +340,58 @@
     }
 
     function drawSky() {
-      ctx.fillStyle = "#3a2b58";
+      const grad = ctx.createLinearGradient(0, 0, 0, world.height);
+      grad.addColorStop(0, "#74b9ff");
+      grad.addColorStop(0.7, "#a8d8ea");
+      grad.addColorStop(1, "#c8f0c8");
+      ctx.fillStyle = grad;
       ctx.fillRect(0, 0, world.width, world.height);
-      ctx.fillStyle = "#4d3973";
-      for (let i = 0; i < world.width; i += 24) {
-        ctx.fillRect(i, 0, 12, 10);
-      }
-      ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
-      for (let y = 12; y < world.height - 34; y += 18) {
-        ctx.fillRect((y * 7) % world.width, y, 10, 2);
-      }
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      drawCloud(38, 42);
+      drawCloud(158, 26);
+      drawCloud(212, 60);
+    }
+
+    function drawCloud(cx, cy) {
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 22, 12, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx + 16, cy - 7, 14, 10, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx - 13, cy - 5, 13, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     function drawBanana(banana) {
-      const color = banana.old ? colors.bad : colors.good;
-      const highlight = banana.old ? "#a5734c" : "#fff4a3";
-      const shadow = banana.old ? "#5c3825" : "#cfb53d";
-      ctx.fillStyle = color;
-      ctx.fillRect(banana.x + 3, banana.y + 1, 7, 2);
-      ctx.fillRect(banana.x + 2, banana.y + 3, 9, 2);
-      ctx.fillRect(banana.x + 2, banana.y + 5, 8, 2);
-      ctx.fillRect(banana.x + 3, banana.y + 7, 6, 2);
-      ctx.fillStyle = highlight;
-      ctx.fillRect(banana.x + 4, banana.y + 2, 4, 1);
-      ctx.fillRect(banana.x + 4, banana.y + 4, 5, 1);
-      ctx.fillStyle = shadow;
-      ctx.fillRect(banana.x + 9, banana.y + 3, 1, 4);
-      ctx.fillRect(banana.x + 8, banana.y + 7, 1, 1);
-      ctx.fillStyle = "#3f2717";
-      ctx.fillRect(banana.x + 10, banana.y + 2, 2, 1);
-      ctx.fillRect(banana.x + 3, banana.y + 8, 2, 1);
+      ctx.save();
+      ctx.font = `${BANANA_SIZE}px system-ui, sans-serif`;
+      ctx.textBaseline = "top";
+      if (banana.old) {
+        ctx.filter = "sepia(1) saturate(0.4) brightness(0.6)";
+      }
+      ctx.fillText("🍌", banana.x, banana.y);
+      ctx.filter = "none";
+      ctx.restore();
     }
 
     function drawBasket() {
       const b = world.basket;
-      ctx.fillStyle = colors.basketRim;
-      ctx.fillRect(b.x, b.y, b.width, 3);
-      ctx.fillStyle = colors.basket;
-      ctx.fillRect(b.x + 2, b.y + 3, b.width - 4, b.height - 3);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
-      for (let x = b.x + 4; x < b.x + b.width - 2; x += 6) {
-        ctx.fillRect(x, b.y + 4, 1, b.height - 4);
-      }
+      ctx.font = `${BASKET_WIDTH}px system-ui, sans-serif`;
+      ctx.textBaseline = "top";
+      ctx.fillText("🧺", b.x, b.y);
     }
 
     function drawGround() {
-      ctx.fillStyle = colors.grass;
-      ctx.fillRect(0, world.height - 8, world.width, 8);
-      ctx.fillStyle = "#58b464";
-      for (let x = 0; x < world.width; x += 6) {
-        ctx.fillRect(x, world.height - 8, 3, 3);
+      const grad = ctx.createLinearGradient(0, world.height - 28, 0, world.height);
+      grad.addColorStop(0, "#55b85a");
+      grad.addColorStop(1, "#2d7a32");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, world.height - 28, world.width, 28);
+      ctx.fillStyle = "#6dcc73";
+      for (let x = 4; x < world.width; x += 14) {
+        ctx.beginPath();
+        ctx.moveTo(x, world.height - 28);
+        ctx.quadraticCurveTo(x + 3, world.height - 40, x + 6, world.height - 28);
+        ctx.fill();
       }
     }
 
@@ -407,14 +404,23 @@
       drawBasket();
 
       if (world.gameOver) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
         ctx.fillRect(0, 0, world.width, world.height);
-        ctx.fillStyle = "#ffe05f";
-        ctx.font = "12px 'Courier New', monospace";
+        const panelW = 190, panelH = 80;
+        const panelX = (world.width - panelW) / 2;
+        const panelY = (world.height - panelH) / 2;
+        ctx.fillStyle = "rgba(255, 253, 220, 0.96)";
+        ctx.beginPath();
+        ctx.roundRect(panelX, panelY, panelW, panelH, 12);
+        ctx.fill();
+        ctx.fillStyle = "#f5a623";
+        ctx.font = "bold 20px system-ui, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("TIME UP!", world.width / 2, world.height / 2 - 8);
-        ctx.fillStyle = "#f8f4d8";
-        ctx.fillText(`Score: ${world.score}`, world.width / 2, world.height / 2 + 12);
+        ctx.textBaseline = "middle";
+        ctx.fillText("⏰ Time Up!", world.width / 2, world.height / 2 - 16);
+        ctx.fillStyle = "#3d2b1f";
+        ctx.font = "16px system-ui, sans-serif";
+        ctx.fillText(`Score: ${world.score} 🍌`, world.width / 2, world.height / 2 + 16);
       }
     }
 
