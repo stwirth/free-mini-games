@@ -240,7 +240,7 @@
         <p id="feedback" class="feedback"></p>
       </section>
 
-      <p class="controls">Click an answer. A wrong answer ends your glorious career as Chief Emergency Meme Officer.</p>
+      <p class="controls">Click an answer. Rack up points across all 10 questions and chase Disaster Legend status.</p>
       <p class="model-info">Model used: GPT-5.5</p>
       <a class="back-link" href="./index.html">← Back to game list</a>
       <p id="announce" class="sr-only" aria-live="polite"></p>
@@ -357,6 +357,9 @@
     }
 
     const questions = shuffleArray(buildQuestionPool()).slice(0, QUESTIONS_PER_GAME).map(randomizeAnswers);
+    const BASE_FEEDBACK_DELAY_MS = 900;
+    const EXTRA_FEEDBACK_DELAY_MS = 2000;
+    const FEEDBACK_DELAY_MS = BASE_FEEDBACK_DELAY_MS + EXTRA_FEEDBACK_DELAY_MS;
 
     const scoreEl = document.getElementById("score");
     const positionEl = document.getElementById("position");
@@ -383,7 +386,7 @@
 
     function renderQuestion() {
       if (index >= questions.length) {
-        finishGame(`You cleared all ${questions.length} questions with ${score} points. Disaster legend.`);
+        finishGame(`You completed all ${questions.length} questions with ${score} points. Disaster legend.`);
         return;
       }
 
@@ -418,7 +421,13 @@
       if (answerIndex !== q.correct) {
         streak = 0;
         streakEl.textContent = "0";
-        finishGame(`Wrong answer. Final score: ${score}.`);
+        const wrongAnswerMessage = `Wrong answer. The correct one was "${q.answers[q.correct]}".`;
+        feedbackEl.textContent = wrongAnswerMessage;
+        announceEl.textContent = wrongAnswerMessage;
+        index += 1;
+        setTimeout(() => {
+          if (!gameOver) renderQuestion();
+        }, FEEDBACK_DELAY_MS);
         return;
       }
 
@@ -432,7 +441,7 @@
       index += 1;
       setTimeout(() => {
         if (!gameOver) renderQuestion();
-      }, 900);
+      }, FEEDBACK_DELAY_MS);
     }
 
     renderQuestion();
