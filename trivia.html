@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disaster Trivia</title>
+  <style>
+    :root {
+      --bg: #fff4e6;
+      --panel: #fffdf8;
+      --text: #4a2f2f;
+      --accent: #ef4444;
+      --ok: #166534;
+      --bad: #991b1b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #ffedd5 0%, #ffe4e6 50%, #fde68a 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      padding: 1rem;
+    }
+
+    .page-layout {
+      max-width: 980px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 560px) 280px;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .game-shell {
+      background: var(--panel);
+      border: 2px solid #fda4af;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+      padding: 1rem;
+    }
+
+    h1 {
+      margin: 0 0 0.8rem;
+      color: var(--accent);
+      font-size: 1.65rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.55rem;
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+    }
+
+    .hud-item {
+      background: #fff1f2;
+      border: 2px solid #fecdd3;
+      border-radius: 8px;
+      text-align: center;
+      padding: 0.5rem 0.25rem;
+      font-size: 0.94rem;
+    }
+
+    .card {
+      border: 2px solid #fed7aa;
+      border-radius: 12px;
+      background: #fff7ed;
+      padding: 0.95rem;
+    }
+
+    .question-number {
+      margin: 0;
+      color: #9a3412;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .question {
+      margin: 0.4rem 0 0.8rem;
+      font-size: 1.02rem;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .answers {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .answer-btn {
+      border: 2px solid #fdba74;
+      border-radius: 10px;
+      background: #fffbeb;
+      color: #7c2d12;
+      text-align: left;
+      padding: 0.65rem 0.7rem;
+      font-size: 0.93rem;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .answer-btn:hover {
+      background: #fff1e6;
+      transform: translateY(-1px);
+    }
+
+    .answer-btn:disabled {
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.88;
+    }
+
+    .answer-btn.correct {
+      border-color: #4ade80;
+      background: #dcfce7;
+      color: var(--ok);
+    }
+
+    .answer-btn.wrong {
+      border-color: #fda4af;
+      background: #ffe4e6;
+      color: var(--bad);
+    }
+
+    .feedback {
+      min-height: 1.6rem;
+      margin: 0.75rem 0 0;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #7c2d12;
+    }
+
+    .controls {
+      margin-top: 0.8rem;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      text-align: center;
+      color: #7c2d12;
+    }
+
+    .model-info {
+      margin-top: 0.65rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #9a3412;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .sidebar {
+      background: var(--panel);
+      border: 2px solid #fda4af;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      padding: 0.8rem;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 0.6rem;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .sidebar li {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: #7c2d12;
+    }
+
+    .sidebar a {
+      color: #dc2626;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 930px) {
+      .page-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-layout">
+    <main class="game-shell">
+      <h1>Disaster Trivia 🌋</h1>
+      <section class="hud" aria-label="Game information">
+        <div class="hud-item">Score: <span id="score">0</span></div>
+        <div class="hud-item">Question: <span id="position">1</span>/<span id="total">0</span></div>
+        <div class="hud-item">Streak: <span id="streak">0</span></div>
+      </section>
+
+      <section class="card" aria-live="polite">
+        <p class="question-number" id="question-number">Question 1</p>
+        <p class="question" id="question">Loading volcanic wisdom...</p>
+        <div id="answers" class="answers"></div>
+        <p id="feedback" class="feedback"></p>
+      </section>
+
+      <p class="controls">Click an answer. A wrong answer ends your glorious career as Chief Emergency Meme Officer.</p>
+      <p class="model-info">Model used: GPT-5.5</p>
+      <a class="back-link" href="./index.html">← Back to game list</a>
+      <p id="announce" class="sr-only" aria-live="polite"></p>
+    </main>
+
+    <aside class="sidebar" aria-label="History">
+      <h2>History</h2>
+      <ul>
+        <li>Add Disaster Trivia with humorous world-disaster questions (<a href="https://github.com/stwirth/free-mini-games/issues/21" target="_blank" rel="noopener">#21</a>)</li>
+      </ul>
+    </aside>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        text: "Which famous ship had an iceberg encounter so awkward it became a 1912 headline?",
+        answers: ["Titanic", "Santa Maria", "USS Enterprise", "The Love Boat"],
+        correct: 0,
+        joke: "Correct. The Titanic discovered that icebergs do not accept apologies."
+      },
+      {
+        text: "The 1883 Krakatoa eruption was so loud that it was heard thousands of miles away. Basically, it was nature's giant:",
+        answers: ["Alarm clock", "Polite knock", "Library whisper", "ASMR stream"],
+        correct: 0,
+        joke: "Yep. One volcanic snooze button was not enough."
+      },
+      {
+        text: "Which city is linked to the Great Fire of 1666, often blamed on a bakery accident?",
+        answers: ["London", "Rome", "Venice", "Paris"],
+        correct: 0,
+        joke: "Right. That bakery review definitely said 'too much heat.'"
+      },
+      {
+        text: "Hurricane Katrina (2005) hit which U.S. Gulf Coast city especially hard?",
+        answers: ["New Orleans", "Seattle", "Denver", "Boston"],
+        correct: 0,
+        joke: "Correct. New Orleans deserved better than extreme weather DLC."
+      },
+      {
+        text: "Chernobyl is located in present-day:",
+        answers: ["Ukraine", "Iceland", "Peru", "Morocco"],
+        correct: 0,
+        joke: "Yes. Not the kind of glow-up anyone wanted."
+      },
+      {
+        text: "Mount Vesuvius buried Pompeii in 79 CE with ash, proving volcanoes can be very:",
+        answers: ["Unsubtle", "Shy", "Budget-friendly", "Moisturizing"],
+        correct: 0,
+        joke: "Exactly. The opposite of subtle feedback."
+      },
+      {
+        text: "The 2011 Tōhoku earthquake and tsunami occurred in:",
+        answers: ["Japan", "Chile", "Canada", "Spain"],
+        correct: 0,
+        joke: "Correct. Nature really picked hard mode that day."
+      },
+      {
+        text: "In disaster prep, what does a 'go bag' mean?",
+        answers: ["A bag of essentials ready to grab quickly", "A bag only for gym shoes", "A bag full of mystery cables", "A decorative bag for vibes only"],
+        correct: 0,
+        joke: "Right. Snacks + flashlight > panic + no snacks."
+      }
+    ];
+
+    const scoreEl = document.getElementById("score");
+    const positionEl = document.getElementById("position");
+    const totalEl = document.getElementById("total");
+    const streakEl = document.getElementById("streak");
+    const questionNumberEl = document.getElementById("question-number");
+    const questionEl = document.getElementById("question");
+    const answersEl = document.getElementById("answers");
+    const feedbackEl = document.getElementById("feedback");
+    const announceEl = document.getElementById("announce");
+
+    let score = 0;
+    let streak = 0;
+    let index = 0;
+    let gameOver = false;
+
+    totalEl.textContent = String(questions.length);
+
+    function finishGame(message) {
+      gameOver = true;
+      feedbackEl.textContent = message + " Refresh to play again.";
+      announceEl.textContent = message;
+    }
+
+    function renderQuestion() {
+      if (index >= questions.length) {
+        finishGame(`You cleared all ${questions.length} questions with ${score} points. Disaster legend.`);
+        return;
+      }
+
+      const q = questions[index];
+      positionEl.textContent = String(index + 1);
+      questionNumberEl.textContent = `Question ${index + 1}`;
+      questionEl.textContent = q.text;
+      feedbackEl.textContent = "";
+      answersEl.innerHTML = "";
+
+      q.answers.forEach((answer, answerIndex) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer-btn";
+        button.textContent = answer;
+        button.addEventListener("click", () => handleAnswer(answerIndex));
+        answersEl.appendChild(button);
+      });
+    }
+
+    function handleAnswer(answerIndex) {
+      if (gameOver) return;
+
+      const q = questions[index];
+      const buttons = answersEl.querySelectorAll(".answer-btn");
+      buttons.forEach((button, i) => {
+        button.disabled = true;
+        if (i === q.correct) button.classList.add("correct");
+        if (i === answerIndex && i !== q.correct) button.classList.add("wrong");
+      });
+
+      if (answerIndex !== q.correct) {
+        streak = 0;
+        streakEl.textContent = "0";
+        finishGame(`Wrong answer. Final score: ${score}.`);
+        return;
+      }
+
+      score += 10;
+      streak += 1;
+      scoreEl.textContent = String(score);
+      streakEl.textContent = String(streak);
+      feedbackEl.textContent = q.joke;
+      announceEl.textContent = q.joke;
+
+      index += 1;
+      setTimeout(() => {
+        if (!gameOver) renderQuestion();
+      }, 900);
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
