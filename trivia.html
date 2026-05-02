@@ -250,61 +250,112 @@
       <h2>History</h2>
       <ul>
         <li>Add Disaster Trivia with humorous world-disaster questions (<a href="https://github.com/stwirth/free-mini-games/issues/21" target="_blank" rel="noopener">#21</a>)</li>
+        <li>Expand trivia pool to 1000 generated prompts and randomize rounds (<a href="https://github.com/stwirth/free-mini-games/issues/23" target="_blank" rel="noopener">#23</a>)</li>
       </ul>
     </aside>
   </div>
 
   <script>
-    const questions = [
-      {
-        text: "Which famous ship had an iceberg encounter so awkward it became a 1912 headline?",
-        answers: ["Titanic", "Santa Maria", "USS Enterprise", "The Love Boat"],
-        correct: 0,
-        joke: "Correct. The Titanic discovered that icebergs do not accept apologies."
-      },
-      {
-        text: "The 1883 Krakatoa eruption was so loud that it was heard thousands of miles away. Basically, it was nature's giant:",
-        answers: ["Alarm clock", "Polite knock", "Library whisper", "ASMR stream"],
-        correct: 0,
-        joke: "Yep. One volcanic snooze button was not enough."
-      },
-      {
-        text: "Which city is linked to the Great Fire of 1666, often blamed on a bakery accident?",
-        answers: ["London", "Rome", "Venice", "Paris"],
-        correct: 0,
-        joke: "Right. That bakery review definitely said 'too much heat.'"
-      },
-      {
-        text: "Hurricane Katrina (2005) hit which U.S. Gulf Coast city especially hard?",
-        answers: ["New Orleans", "Seattle", "Denver", "Boston"],
-        correct: 0,
-        joke: "Correct. New Orleans deserved better than extreme weather DLC."
-      },
-      {
-        text: "Chernobyl is located in present-day:",
-        answers: ["Ukraine", "Iceland", "Peru", "Morocco"],
-        correct: 0,
-        joke: "Yes. Not the kind of glow-up anyone wanted."
-      },
-      {
-        text: "Mount Vesuvius buried Pompeii in 79 CE with ash, proving volcanoes can be very:",
-        answers: ["Unsubtle", "Shy", "Budget-friendly", "Moisturizing"],
-        correct: 0,
-        joke: "Exactly. The opposite of subtle feedback."
-      },
-      {
-        text: "The 2011 Tōhoku earthquake and tsunami occurred in:",
-        answers: ["Japan", "Chile", "Canada", "Spain"],
-        correct: 0,
-        joke: "Correct. Nature really picked hard mode that day."
-      },
-      {
-        text: "In disaster prep, what does a 'go bag' mean?",
-        answers: ["A bag of essentials ready to grab quickly", "A bag only for gym shoes", "A bag full of mystery cables", "A decorative bag for vibes only"],
-        correct: 0,
-        joke: "Right. Snacks + flashlight > panic + no snacks."
-      }
+    const QUESTIONS_PER_GAME = 10;
+    const QUESTION_POOL_SIZE = 1000;
+    const baseQuestions = [
+      { text: "Which famous ship hit an iceberg in 1912?", answers: ["Titanic", "Santa Maria", "USS Enterprise", "Bismarck"], correct: 0, joke: "Correct. Icebergs are unforgiving critics." },
+      { text: "The Great Fire of 1666 is associated with which city?", answers: ["London", "Rome", "Vienna", "Prague"], correct: 0, joke: "Right. That bakery had one very bad day." },
+      { text: "Hurricane Katrina (2005) devastated which U.S. city?", answers: ["New Orleans", "Phoenix", "Detroit", "Portland"], correct: 0, joke: "Correct. Storm surge is not optional DLC." },
+      { text: "Chernobyl is in present-day which country?", answers: ["Ukraine", "Belarus", "Poland", "Estonia"], correct: 0, joke: "Yes. Not a glow-up anyone requested." },
+      { text: "The 2011 Tōhoku earthquake and tsunami struck which country?", answers: ["Japan", "Argentina", "Norway", "Mexico"], correct: 0, joke: "Correct. Hard mode, activated." },
+      { text: "What is a go bag in emergency prep?", answers: ["A ready-to-grab essentials bag", "A bag only for gym shoes", "A bag for charging cables only", "A bag for souvenirs"], correct: 0, joke: "Right. Grab-and-go beats panic-and-slow." },
+      { text: "Which volcano caused the 'Year Without a Summer' in 1816?", answers: ["Mount Tambora", "Mount St. Helens", "Kīlauea", "Mount Etna"], correct: 0, joke: "Correct. Tambora changed global weather settings." },
+      { text: "The 1755 earthquake, tsunami, and fires devastated which European capital?", answers: ["Lisbon", "Madrid", "Athens", "Brussels"], correct: 0, joke: "Yes. Lisbon suffered a triple disaster combo." },
+      { text: "The deadliest U.S. natural disaster by fatalities is generally considered which event?", answers: ["1900 Galveston hurricane", "1906 San Francisco earthquake", "Hurricane Andrew", "Dust Bowl"], correct: 0, joke: "Correct. Galveston remains a sobering benchmark." },
+      { text: "The Bhopal disaster (1984) happened in which country?", answers: ["India", "Pakistan", "Sri Lanka", "Nepal"], correct: 0, joke: "Right. Industrial safety rules are written in lessons like this." },
+      { text: "Fukushima Daiichi is located in which country?", answers: ["Japan", "South Korea", "China", "Thailand"], correct: 0, joke: "Correct. A quake and tsunami triggered cascading failures." },
+      { text: "The 1906 earthquake and fires struck which U.S. city?", answers: ["San Francisco", "Los Angeles", "Chicago", "Miami"], correct: 0, joke: "Correct. Fault lines do not respect city planning." },
+      { text: "The Dust Bowl of the 1930s heavily affected which region?", answers: ["U.S. Great Plains", "Amazon Basin", "Sahara fringe", "Iberian Peninsula"], correct: 0, joke: "Yes. Soil, drought, and wind formed a brutal combo." },
+      { text: "Cyclone Nargis (2008) caused major loss of life in which country?", answers: ["Myanmar", "Vietnam", "Indonesia", "Malaysia"], correct: 0, joke: "Correct. Coastal vulnerability can be catastrophic." },
+      { text: "The 2004 Indian Ocean earthquake and tsunami had a magnitude near:", answers: ["9.1", "6.4", "7.0", "8.0"], correct: 0, joke: "Right. A massive megathrust event." },
+      { text: "Nevado del Ruiz triggered the Armero tragedy in which country?", answers: ["Colombia", "Ecuador", "Bolivia", "Peru"], correct: 0, joke: "Correct. Lahars can erase towns in minutes." },
+      { text: "Mount Pinatubo's 1991 eruption occurred in which country?", answers: ["Philippines", "Indonesia", "Japan", "Papua New Guinea"], correct: 0, joke: "Yes. One eruption, global atmospheric effects." },
+      { text: "The 2010 Haiti earthquake heavily impacted which city?", answers: ["Port-au-Prince", "Cap-Haïtien", "Santo Domingo", "Kingston"], correct: 0, joke: "Correct. Dense urban damage was severe." },
+      { text: "The largest instrumentally recorded earthquake (1960) occurred near Valdivia in:", answers: ["Chile", "Peru", "Mexico", "Japan"], correct: 0, joke: "Right. Magnitude 9.5 is huge." },
+      { text: "Eyjafjallajökull's 2010 eruption disrupted flights from which country?", answers: ["Iceland", "Greenland", "Sweden", "Ireland"], correct: 0, joke: "Correct. Ash clouds grounded Europe." },
+      { text: "The Banqiao Dam failure (1975) occurred in which country?", answers: ["China", "India", "Laos", "Mongolia"], correct: 0, joke: "Correct. Infrastructure risk can scale brutally." },
+      { text: "The Tangshan earthquake (1976) struck which country?", answers: ["China", "Turkey", "Iran", "Russia"], correct: 0, joke: "Yes. A devastating urban quake." },
+      { text: "The Messina earthquake and tsunami (1908) struck which country?", answers: ["Italy", "Greece", "Spain", "Croatia"], correct: 0, joke: "Correct. Strait cities were hit hard." },
+      { text: "The Bhola cyclone (1970) primarily affected today's:", answers: ["Bangladesh", "India", "Sri Lanka", "Myanmar"], correct: 0, joke: "Correct. Disaster governance became a central issue." },
+      { text: "The 1883 Krakatoa eruption occurred in present-day:", answers: ["Indonesia", "Philippines", "Papua New Guinea", "Japan"], correct: 0, joke: "Right. Heard across astonishing distances." },
+      { text: "In hazard planning, what does mitigation mean?", answers: ["Reducing long-term risk before disasters", "Only responding after impact", "Relocating satellites", "Ignoring small hazards"], correct: 0, joke: "Correct. Prevention beats regret." },
+      { text: "Which scale is used for tornado intensity ratings in the U.S. today?", answers: ["Enhanced Fujita scale", "Richter scale", "Mercalli scale", "Saffir-Simpson scale"], correct: 0, joke: "Yes. EF scale for tornado damage intensity." },
+      { text: "Which warning is generally most urgent for immediate coastal danger?", answers: ["Tsunami warning", "Tsunami watch", "Monthly climate outlook", "Marine forecast"], correct: 0, joke: "Correct. Warning means act now." },
+      { text: "The Saffir-Simpson scale is used for:", answers: ["Hurricane wind category", "Earthquake magnitude", "Volcanic explosivity", "Flood recurrence"], correct: 0, joke: "Right. Different hazards, different scales." },
+      { text: "A 1% annual-chance flood is often called:", answers: ["100-year flood", "10-year flood", "1000-year flood", "50-year flood"], correct: 0, joke: "Correct. And yes, it can happen back-to-back years." },
+      { text: "The 1985 Nevado del Ruiz tragedy is a classic example of risk from:", answers: ["Lahars", "Lava fountains", "Acid rain", "Dust devils"], correct: 0, joke: "Correct. Volcanic mudflows are fast and deadly." },
+      { text: "When an earthquake is shallow and offshore, the follow-up hazard can be:", answers: ["Tsunami", "Aurora", "Heat dome", "Drought"], correct: 0, joke: "Right. Multi-hazard thinking matters." },
+      { text: "The Richter scale has largely been replaced in seismology by:", answers: ["Moment magnitude (Mw)", "Beaufort scale", "VEI", "Palmer index"], correct: 0, joke: "Correct. Mw handles very large quakes better." },
+      { text: "Which term describes sudden ground shaking from slipping faults?", answers: ["Earthquake", "Monsoon", "Blizzard", "Wildfire"], correct: 0, joke: "Correct. Fault slip releases stored strain." },
+      { text: "Which agency issues Atlantic tropical cyclone advisories for the U.S.?", answers: ["National Hurricane Center", "USGS Volcano Hazards Program", "NOAA Fisheries", "EPA"], correct: 0, joke: "Correct. NHC products are key during storms." }
     ];
+
+    function shuffleArray(items) {
+      for (let i = items.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      return items;
+    }
+
+    function randomizeAnswers(question) {
+      const mappedAnswers = question.answers.map((answer, answerIndex) => ({
+        answer,
+        isCorrect: answerIndex === question.correct
+      }));
+      shuffleArray(mappedAnswers);
+      return {
+        ...question,
+        answers: mappedAnswers.map((choice) => choice.answer),
+        correct: mappedAnswers.findIndex((choice) => choice.isCorrect)
+      };
+    }
+
+    function buildQuestionPool() {
+      const leadIns = [
+        "Rapid round:",
+        "Field drill:",
+        "History check:",
+        "Hard mode:",
+        "Command center:",
+        "No hints:",
+        "Deep cut:",
+        "Hazard lab:"
+      ];
+      const followUps = [
+        "Choose the best answer.",
+        "Trust your prep instincts.",
+        "Pick carefully.",
+        "One of these is solid disaster trivia.",
+        "Answer like the team is watching.",
+        "No pressure, just points.",
+        "Think before the siren.",
+        "Go with your best read."
+      ];
+      const pool = [];
+      let variantIndex = 0;
+      while (pool.length < QUESTION_POOL_SIZE) {
+        const source = baseQuestions[pool.length % baseQuestions.length];
+        const lead = leadIns[variantIndex % leadIns.length];
+        const follow = followUps[Math.floor(variantIndex / leadIns.length) % followUps.length];
+        pool.push({
+          ...source,
+          text: `${lead} ${source.text} ${follow}`
+        });
+        if ((pool.length % baseQuestions.length) === 0) {
+          variantIndex += 1;
+        }
+      }
+      return pool;
+    }
+
+    const questions = shuffleArray(buildQuestionPool()).slice(0, QUESTIONS_PER_GAME).map(randomizeAnswers);
 
     const scoreEl = document.getElementById("score");
     const positionEl = document.getElementById("position");
