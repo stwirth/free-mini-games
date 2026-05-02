@@ -421,8 +421,9 @@
       if (answerIndex !== q.correct) {
         streak = 0;
         streakEl.textContent = "0";
-        feedbackEl.textContent = `Wrong answer. The correct one was "${q.answers[q.correct]}".`;
-        announceEl.textContent = `Wrong answer. The correct one was ${q.answers[q.correct]}.`;
+        const wrongAnswerMessage = `Wrong answer. The correct one was "${q.answers[q.correct]}".`;
+        feedbackEl.textContent = wrongAnswerMessage;
+        announceEl.textContent = wrongAnswerMessage;
         index += 1;
         setTimeout(() => {
           if (!gameOver) renderQuestion();
