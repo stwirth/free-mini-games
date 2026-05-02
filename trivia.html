@@ -357,7 +357,9 @@
     }
 
     const questions = shuffleArray(buildQuestionPool()).slice(0, QUESTIONS_PER_GAME).map(randomizeAnswers);
-    const FEEDBACK_DELAY_MS = 2900;
+    const BASE_FEEDBACK_DELAY_MS = 900;
+    const EXTRA_FEEDBACK_DELAY_MS = 2000;
+    const FEEDBACK_DELAY_MS = BASE_FEEDBACK_DELAY_MS + EXTRA_FEEDBACK_DELAY_MS;
 
     const scoreEl = document.getElementById("score");
     const positionEl = document.getElementById("position");
